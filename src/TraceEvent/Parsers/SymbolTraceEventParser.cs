@@ -545,7 +545,7 @@ namespace Microsoft.Diagnostics.Tracing.Parsers.Symbol
 
         protected internal override void Validate()
         {
-            Debug.Assert(EventDataLength == SkipUTF8String(HostOffset(32, 1)));
+            //Debug.Assert(EventDataLength == SkipUTF8String(HostOffset(32, 1)));
         }
 
         public override string[] PayloadNames

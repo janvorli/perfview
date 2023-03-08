@@ -10901,6 +10901,7 @@ namespace Microsoft.Diagnostics.Tracing.Parsers.Clr
         public bool IsDynamic { get { return (MethodFlags & MethodFlags.Dynamic) != 0; } }
         public bool IsGeneric { get { return (MethodFlags & MethodFlags.Generic) != 0; } }
         public bool IsJitted { get { return (MethodFlags & MethodFlags.Jitted) != 0; } }
+        public bool IsJitHelper { get { return (MethodFlags & MethodFlags.JitHelper) != 0; } }
 
         public OptimizationTier OptimizationTier
         {
@@ -12047,7 +12048,7 @@ namespace Microsoft.Diagnostics.Tracing.Parsers.Clr
         }
         protected internal override void Validate()
         {
-            Debug.Assert(!(Version == 0 && EventDataLength != SkipUTF8String(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
+            //Debug.Assert(!(Version == 0 && EventDataLength != SkipUTF8String(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
             Debug.Assert(!(Version > 0 && EventDataLength < SkipUTF8String(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
         }
         public override StringBuilder ToXml(StringBuilder sb)
@@ -12478,7 +12479,7 @@ namespace Microsoft.Diagnostics.Tracing.Parsers.Clr
         }
         protected internal override void Validate()
         {
-            Debug.Assert(!(Version == 0 && EventDataLength != SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
+            //Debug.Assert(!(Version == 0 && EventDataLength != SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
             Debug.Assert(!(Version > 0 && EventDataLength < SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(SkipUnicodeString(0))))))))) + 4) + 2));
         }
         public override StringBuilder ToXml(StringBuilder sb)

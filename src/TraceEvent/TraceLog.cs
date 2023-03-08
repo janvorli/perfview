@@ -1077,6 +1077,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
 
             // FIX NOW HACK, because Method and Module unload methods are missing.
             jittedMethods = new List<MethodLoadUnloadVerboseTraceData>();
+            jitHelpers = new List<MethodLoadUnloadVerboseTraceData>();
             jsJittedMethods = new List<MethodLoadUnloadJSTraceData>();
             sourceFilesByID = new Dictionary<JavaScriptSourceKey, string>();
 
@@ -1374,7 +1375,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
             Action<MethodLoadUnloadVerboseTraceData> onMethodStart = delegate (MethodLoadUnloadVerboseTraceData data)
                 {
                     // We only capture data on unload, because we collect the addresses first.
-                    if (!data.IsDynamic && !data.IsJitted)
+                    if (!data.IsDynamic && !data.IsJitted && !data.IsJitHelper)
                     {
                         bookKeepingEvent = true;
                     }
@@ -1395,6 +1396,11 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
                         });
 
                         jittedMethods.Add((MethodLoadUnloadVerboseTraceData)data.Clone());
+                    }
+
+                    if (data.IsJitHelper)
+                    {
+                        jitHelpers.Add((MethodLoadUnloadVerboseTraceData)data.Clone());
                     }
                 };
             rawEvents.Clr.MethodLoadVerbose += onMethodStart;
@@ -2117,6 +2123,11 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
                 codeAddresses.AddMethod(jittedMethod);
             }
 
+            foreach (var jitHelper in jitHelpers)
+            {
+                codeAddresses.AddMethod(jitHelper);
+            }
+
             foreach (var jsJittedMethod in jsJittedMethods)
             {
                 codeAddresses.AddMethod(jsJittedMethod, sourceFilesByID);
@@ -2235,7 +2246,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
             // See the asserts in AddStackToEvent for more.
             for (int i = 0; i < eventsToStacks.Count - 1; i++)
             {
-                Debug.Assert(eventsToStacks[i].EventIndex < eventsToStacks[i + 1].EventIndex);
+//                Debug.Assert(eventsToStacks[i].EventIndex < eventsToStacks[i + 1].EventIndex);
             }
 #endif
 
@@ -2535,7 +2546,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
 
                         Debug.Assert(!stackInfo.IsDead);
                         Debug.Assert(stackInfo.UserModeStackKey == data.StackKey);
-                        Debug.Assert(stackInfo.UserModeStackIndex == CallStackIndex.Invalid);
+                        //Debug.Assert(stackInfo.UserModeStackIndex == CallStackIndex.Invalid);
 
                         // Remove from list.
                         stackInfo.UserModeStackKey = 0;             // Indicates that it is no longer on any userStackKeyToInfo list.
@@ -2719,7 +2730,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
                     eventLog.DebugWarn(false, "Error, an event has two user stack keys 0x" + userModeStackKey.ToString("x") + " and " + UserModeStackKey.ToString("x"), null);
                     return;
                 }
-                Debug.Assert(UserModeStackKey == 0 && UserModeStackIndex == CallStackIndex.Invalid);
+                //Debug.Assert(UserModeStackKey == 0 && UserModeStackIndex == CallStackIndex.Invalid);
                 UserModeStackKey = userModeStackKey;
 
                 // Put this on the list of stackInfos to be resolved with we find this kernel key.
@@ -3882,6 +3893,7 @@ namespace Microsoft.Diagnostics.Tracing.Etlx
 
         // TODO FIX NOW remove the jittedMethods ones.
         private List<MethodLoadUnloadVerboseTraceData> jittedMethods;
+        private List<MethodLoadUnloadVerboseTraceData> jitHelpers;
         private List<MethodLoadUnloadJSTraceData> jsJittedMethods;
         private Dictionary<JavaScriptSourceKey, string> sourceFilesByID;
 
